@@ -1,25 +1,51 @@
-import { useState } from "react";
+import { useState } from "react"
+import { useNavigate } from "react-router";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+
+// business logic
 import { login } from "../services/authService"
+import { saveAuth } from "../utils/authStorage"
 
 const Login = () => {
+    const navigate = useNavigate();
+
     const [formData, setFormData] = useState({
         email: "",
         password: "",
     });
 
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // console.log(formData);
+        setError("")
+
+        if (!formData.email || !formData.password) {
+            setError("Please Fill all the fields!")
+            return;
+        }
+
 
         try {
-            const response = await login(formData)
-            console.log(response)
+            setLoading(true);
+
+            const data = await login(formData)
+
+            console.log(data)
+            // saveAuth(data.token, data.user);
+            const token = data.token;
+            const user = data.user;
+            saveAuth({ token, user })
+            navigate("/dashboard")
         } catch (error) {
-            console.log(error.response)
-            console.log(error.response.data)
+            setError(
+                error.response?.data?.message || "Someting Went Wrong. Try again!"
+            )
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -30,6 +56,10 @@ const Login = () => {
                 className="max-w-md w-full bg-white p-6 rounded-lg shadow-md"
             >
                 <h1 className="text-3xl font-bold text-center mb-6">Login</h1>
+
+                {error && (
+                    <div className="mb-4 rounded bg-red-100 text-red-700 px-3 py-2">{error}</div>
+                )}
 
                 <input
                     type="email"
@@ -72,17 +102,21 @@ const Login = () => {
                     type="submit"
                     className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 rounded transition"
                 >
-                    Login
+                    {/* Login */}
+                    {loading ? "Logging in ..." : "Login"}
                 </button>
 
                 <p className="text-center mt-4 text-gray-600">
                     Don't have an account?{" "}
-                    <span className="text-amber-500 cursor-pointer hover:underline">
+                    <span
+                        onClick={() => navigate("/signup")}
+                        className="text-amber-500 cursor-pointer hover:underline"
+                    >
                         Sign Up
                     </span>
                 </p>
-            </form>
-        </div>
+            </form >
+        </div >
     );
 };
 

@@ -1,9 +1,14 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+
+// business logic layers
 import { signup } from "../services/authService"
+import { saveAuth } from "../utils/authStorage"
 
 
 const Signup = () => {
+    const navigate = useNavigate()
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -13,16 +18,48 @@ const Signup = () => {
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState("")
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError("")
+
+        if (
+            !formData.name ||
+            !formData.email ||
+            !formData.password ||
+            !formData.confirmPassword
+        ) {
+            setError("Please fill all fields")
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+            setError("Passwords donot match")
+        }
+
 
         try {
-            const response = await signup(formData)
-            console.log(response)
-        }catch(err){
-            console.log(err.response)
-            console.log(err.response.data)
+            setLoading(true)
+
+
+            const response = await signup({
+                name: formData.name,
+                email: formData.email,
+                password: formData.password
+            });
+
+            const token = response.token;
+            const user = response.user;
+            saveAuth({ token, user })
+            
+            navigate("/dashboard")
+        } catch (err) {
+            setError(
+                err.response?.response?.message || "Somewhting went wrong. Try again"
+            )
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -40,6 +77,13 @@ const Signup = () => {
                     Sign up to continue
                 </p>
 
+                {error && (
+                    <div
+                        className="mb-4 rounded bg-red-100 text-red-700 px-3 py-2"
+                    >
+                        {error}
+                    </div>
+                )}
                 <input
                     type="text"
                     placeholder="Full Name"
@@ -128,12 +172,16 @@ const Signup = () => {
                     type="submit"
                     className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 rounded-md transition duration-200"
                 >
-                    Create Account
+                    {/* Create Account */}
+                    {loading ? "Creating Account" : "Create Account"}
                 </button>
 
                 <p className="text-center text-gray-600 mt-6">
                     Already have an account?{" "}
-                    <span className="text-amber-500 hover:underline cursor-pointer font-medium">
+                    <span
+                        onClick={() => navigate("/login")}
+                        className="text-amber-500 hover:underline cursor-pointer font-medium"
+                    >
                         Login
                     </span>
                 </p>

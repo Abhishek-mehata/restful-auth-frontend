@@ -1,363 +1,211 @@
-# Understanding Router, Layout, Pages, and Components in React
+# Restful Auth Frontend
 
-Imagine you're building a movie booking website like **TheatreHub**.
+A modern React-based frontend for **Authentication**, featuring JWT authentication, a responsive dashboard, and a clean, scalable architecture.
 
-When a user visits your website, React follows this flow:
+> **Status:** 🚧 In Development
+
+---
+
+## 📌 Overview
+
+DevHub Frontend is built with React and communicates with the DevHub Backend through REST APIs. It provides a smooth authentication flow, manages user sessions, and offers a clean dashboard interface.
+
+This project focuses on learning and implementing real-world frontend architecture, API integration, and authentication using JWT.
+
+---
+
+## ✨ Features
+
+* 🔐 User Signup
+* 🔑 User Login
+* 🛡️ JWT Authentication
+* 📡 REST API Integration using Axios
+* ⚡ Axios Request & Response Interceptors
+* 💾 Persistent Authentication using Local Storage
+* 📊 Responsive Dashboard UI
+* 🧩 Component-Based Architecture
+* 🎨 Responsive Design with Tailwind CSS
+
+---
+
+## 🛠️ Tech Stack
+
+* React
+* React Router DOM
+* Axios
+* Tailwind CSS
+* React Icons
+* Vite
+
+---
+
+## 📂 Project Structure
 
 ```text
-User Visits URL
-       │
-       ▼
-     Router
-       │
-       ▼
-     Layout
-       │
-       ▼
-      Page
-       │
-       ▼
-   Components
-```
+.
 
-Let's understand each one.
+├── src
+│   ├── App.jsx
+│   ├── api
+│   │   └── axios.js
+│   ├── components
+│   │   ├── Dashboard
+│   │   │   ├── Navbar.jsx
+│   │   │   ├── RecentActivity.jsx
+│   │   │   ├── Sidebar.jsx
+│   │   │   ├── StatCard.jsx
+│   │   │   └── UserProfile.jsx
+│   ├── context
+│   │   └── AuthContext.jsx
+│   ├── index.css
+│   ├── main.jsx
+│   ├── pages
+│   │   ├── Dashboard.jsx
+│   │   ├── Login.jsx
+│   │   └── Signup.jsx
+│   ├── routes
+│   │   └── router.jsx
+│   ├── services
+│   │   └── authService.js
+│   └── utils
+│       └── authStorage.js
+```
 
 ---
 
-# 1. Router
+## 🚀 Getting Started
 
-The **Router** decides **which page should be shown** based on the URL.
+### Clone the repository
 
-For example,
+```bash
+git clone https://github.com/<your-username>/devhub-frontend.git
+```
+
+### Navigate to the project
+
+```bash
+cd devhub-frontend
+```
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Start the development server
+
+```bash
+npm run dev
+```
+
+The application will run on:
 
 ```text
-/          → Home Page
-/movies    → Movies Page
-/profile   → Profile Page
-/login     → Login Page
+http://localhost:5173
 ```
 
-### Example
+---
 
-```jsx
-import { createBrowserRouter } from "react-router-dom";
+## 🔗 Backend
 
-import MainLayout from "../layouts/MainLayout";
-import Home from "../pages/Home";
-import Movies from "../pages/Movies";
-import Login from "../pages/Login";
+This frontend communicates with the DevHub Backend.
 
-const router = createBrowserRouter([
-  {
-    element: <MainLayout />,
-    children: [
-      {
-        path: "/",
-        element: <Home />,
-      },
-      {
-        path: "/movies",
-        element: <Movies />,
-      },
-    ],
-  },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-]);
+Backend Repository:
 
-export default router;
-```
+**👉 Add your backend GitHub repository link here**
 
-When the user visits:
+Example:
 
 ```text
-http://localhost:5173/movies
+https://github.com/<your-username>/devhub-backend
 ```
-
-React displays the **Movies** page.
 
 ---
 
-# 2. Layout
-
-A **Layout** contains everything that should appear on multiple pages.
-
-Instead of writing the Navbar and Footer on every page, create one layout.
-
-### Without Layout
-
-```jsx
-function Home() {
-  return (
-    <>
-      <Navbar />
-      <HomeContent />
-      <Footer />
-    </>
-  );
-}
-```
-
-```jsx
-function Movies() {
-  return (
-    <>
-      <Navbar />
-      <MoviesContent />
-      <Footer />
-    </>
-  );
-}
-```
-
-Notice how the Navbar and Footer are repeated.
-
-### With Layout
-
-```jsx
-import { Outlet } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-
-function MainLayout() {
-  return (
-    <>
-      <Navbar />
-
-      <main>
-        <Outlet />
-      </main>
-
-      <Footer />
-    </>
-  );
-}
-
-export default MainLayout;
-```
-
-`<Outlet />` is the place where React renders the current page.
-
-If the user visits:
+## 🔄 Authentication Flow
 
 ```text
-/movies
-```
-
-React renders:
-
-```text
-Navbar
-------------
-Movies Page
-------------
-Footer
-```
-
----
-
-# 3. Pages
-
-A **Page** is a complete screen that users visit.
-
-Examples:
-
-```text
-Home
-Movies
-Movie Details
-Profile
-Login
-```
-
-Each page usually combines multiple components.
-
-### Home.jsx
-
-```jsx
-import Hero from "../components/Hero";
-import MovieList from "../components/MovieList";
-
-function Home() {
-  return (
-    <>
-      <Hero />
-      <MovieList />
-    </>
-  );
-}
-
-export default Home;
-```
-
-The Home page doesn't create every UI element itself—it simply combines reusable components.
-
----
-
-# 4. Components
-
-Components are small, reusable pieces of the UI.
-
-Examples:
-
-```text
-Navbar
-Footer
-Button
-MovieCard
-SearchBar
-Loader
-```
-
-### Example
-
-```jsx
-function MovieCard({ movie }) {
-  return (
-    <div>
-      <img src={movie.poster} alt={movie.title} />
-      <h2>{movie.title}</h2>
-    </div>
-  );
-}
-
-export default MovieCard;
-```
-
-Now you can reuse it many times.
-
-```jsx
-<MovieCard movie={movie1} />
-<MovieCard movie={movie2} />
-<MovieCard movie={movie3} />
-```
-
-Write once, use everywhere.
-
----
-
-# Project Structure
-
-```text
-src/
-│
-├── components/
-│   ├── Navbar.jsx
-│   ├── Footer.jsx
-│   ├── MovieCard.jsx
-│   └── SearchBar.jsx
-│
-├── pages/
-│   ├── Home.jsx
-│   ├── Movies.jsx
-│   ├── Login.jsx
-│   └── Profile.jsx
-│
-├── layouts/
-│   └── MainLayout.jsx
-│
-├── routes/
-│   └── router.jsx
-│
-├── App.jsx
-└── main.jsx
+User Login / Signup
+        │
+        ▼
+React Form
+        │
+        ▼
+Auth Service
+        │
+        ▼
+Axios Instance
+        │
+        ▼
+Backend API
+        │
+        ▼
+JWT Token
+        │
+        ▼
+Local Storage
+        │
+        ▼
+Dashboard
 ```
 
 ---
 
-# Complete Flow
+## 📸 Screenshots
 
-Suppose the user opens:
+Add screenshots here after completing the UI.
 
-```text
-http://localhost:5173/movies
-```
+Suggested screenshots:
 
-### Step 1: Router
-
-The router checks the URL.
-
-```jsx
-{
-  path: "/movies",
-  element: <Movies />
-}
-```
-
-It decides to render the **Movies** page.
+* Login Page
+* Signup Page
+* Dashboard
 
 ---
 
-### Step 2: Layout
+## 📚 What I Learned
 
-The router sees that the Movies page uses `MainLayout`.
+During this project, I explored and implemented:
 
-```jsx
-<Navbar />
-<Outlet />
-<Footer />
-```
-
----
-
-### Step 3: Page
-
-Inside `<Outlet />`, React renders:
-
-```jsx
-<Movies />
-```
+* Connecting React with an Express backend
+* Working with REST APIs
+* JWT-based authentication
+* Axios interceptors
+* Service layer architecture
+* Authentication persistence
+* Component-based React architecture
+* Error handling during API communication
+* Organizing scalable React projects
 
 ---
 
-### Step 4: Components
+## 🚀 Future Improvements
 
-The Movies page displays reusable components.
-
-```jsx
-function Movies() {
-  return (
-    <>
-      <SearchBar />
-      <MovieCard />
-      <MovieCard />
-      <MovieCard />
-    </>
-  );
-}
-```
-
----
-
-# Final Rendering
-
-The browser finally displays:
-
-```text
--------------------------
-Navbar
--------------------------
-
-Search Bar
-
-Movie Card
-Movie Card
-Movie Card
-
--------------------------
-Footer
--------------------------
-```
+* Password hashing support (Backend)
+* Context API for global authentication
+* Protected Routes
+* User Profile Page
+* Project Management Module
+* Task Management
+* Theme Toggle
+* Form Validation
+* Toast Notifications
+* Better Error Handling
+* Loading Skeletons
+* Role-Based Authentication
+* Refresh Token Authentication
 
 ---
 
-# One-Line Summary
+## 🤝 Contributing
 
-* **Router** → Decides **which page** to display based on the URL.
-* **Layout** → Provides the **shared structure** (Navbar, Footer, Sidebar, etc.).
-* **Page** → Represents a **complete screen** for a specific route.
-* **Component** → A **reusable UI building block** used inside pages or layouts.
+Contributions, suggestions, and feedback are welcome.
 
-Together, they create a clean, scalable, and maintainable React application.
+Feel free to fork the repository and create a pull request.
+
+---
+
+## 📄 License
+
+This project is created for learning and educational purposes.
